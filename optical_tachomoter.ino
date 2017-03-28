@@ -31,11 +31,13 @@ Arduino 1.6.7
 //volatile byte count;
 //float count;
 unsigned long count;
+unsigned long display_count;
 unsigned int time;
 unsigned long timeold;
 unsigned int rpm;
 unsigned int rps;
 unsigned long trigNum = 4;  //number of trigger points on encoder wheel
+
 
 void rpm_fun()
  {
@@ -52,7 +54,8 @@ void setup()
    Serial.begin(9600);
    //Interrupt 0 is digital pin 2, so that is where the IR detector is connected
    //Triggers on FALLING (change from HIGH to LOW)
-   attachInterrupt(0, rpm_fun, FALLING);
+//   attachInterrupt(0, rpm_fun, FALLING);
+   attachInterrupt(digitalPinToInterrupt(2), rpm_fun, RISING);
 
    count = 0;
    rpm = 0;
@@ -76,6 +79,7 @@ void setup()
 
    rpm = 60 * (1000 * count / (trigNum*(time - timeold)));
    //rpm = 60 * count / (trigNum*(time - timeold)/1000);
+   display_count = count;
   
    timeold = millis();
    count = 0;
@@ -85,9 +89,11 @@ void setup()
    Serial.println(rps);
    Serial.print("RPM=");
    Serial.println(rpm);
+   Serial.println(display_count);
    Serial.println("");
    
 
    //Restart the interrupt processing
-   attachInterrupt(0, rpm_fun, FALLING);
+//   attachInterrupt(0, rpm_fun, FALLING);
+   attachInterrupt(digitalPinToInterrupt(2), rpm_fun, FALLING);
   }
